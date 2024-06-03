@@ -6,16 +6,19 @@
         <input v-model="search" type="text" />
       </div>
       <div class="col-6 pe-0">
-        <select  v-model="selected">
+        <select v-model="selected">
           <option>All</option>
           <option>Alive</option>
           <option>Dead</option>
           <option>unknown</option>
         </select>
       </div>
+      <div class="col-12 text-center mt-4">
+        <button class="submit" v-on:click="submitFilter()">SUBMIT</button>
+      </div>
     </div>
     <div class="row">
-      <div v-for="item in filterChar" :key="item" class="col-lg-6 cards">
+      <div v-for="item in newArray" :key="item" class="col-lg-6 cards">
         <div class="row mycard">
           <div class="col-sm-6 p-0">
             <img :src="item.image" :alt="item.name" class="h-100 w-100" />
@@ -52,30 +55,11 @@ export default {
   name: "App",
   data() {
     return {
-      answer: {},
+      answer: [],
       search: "",
       selected: "All",
+      newArray: [],
     };
-  },
-  computed: {
-    filterChar() {
-      if (this.selected === "All") {
-        if (this.search.length > 0) {
-          return this.answer.filter((e) => {
-            return e.name.toLowerCase().includes(this.search.toLowerCase());
-          });
-        } else {
-          return this.answer;
-        }
-      } else {
-        return this.answer.filter((e) => {
-          return (
-            e.status === this.selected &&
-            e.name.toLowerCase().includes(this.search.toLowerCase())
-          );
-        });
-      }
-    },
   },
   methods: {
     async getAnswer() {
@@ -83,6 +67,7 @@ export default {
         "https://rickandmortyapi.com/api/character"
       );
       this.answer = data.results;
+      this.newArray = this.answer;
     },
     setColor(status) {
       if (status === "Alive") {
@@ -93,9 +78,30 @@ export default {
         return "gray";
       }
     },
+    submitFilter() {
+      this.newArray = this.answer;
+      if (this.selected === "All") {
+        if (this.search.length > 0) {
+          this.newArray = this.answer.filter((e) => {
+            return e.name.toLowerCase().includes(this.search.toLowerCase());
+          });
+        } else {
+          return this.answer;
+        }
+      } else {
+        this.newArray = this.answer.filter((e) => {
+          return (
+            e.status === this.selected &&
+            e.name.toLowerCase().includes(this.search.toLowerCase())
+          );
+        });
+      }
+      console.log(this.answer);
+    },
   },
   beforeMount() {
     this.getAnswer();
+    
   },
 };
 </script>
@@ -105,7 +111,7 @@ body {
   background: #272b33 !important;
 }
 select,
-input {
+input, .submit {
   width: 50%;
   height: 30px;
   background-color: #3c3e44;
@@ -113,6 +119,7 @@ input {
   border-radius: 10px;
   color: white;
   padding: 0 0.5rem;
+
 }
 .green {
   background: #55cc44;
